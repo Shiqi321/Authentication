@@ -1,0 +1,35 @@
+jwt:
+  alg: "RS256"
+  typ: "JWT"
+  access_token_expiration: 30
+  refresh_token_expiration: 300
+  issuer: "alivia"
+  aduience: "resource"
+
+keyPair:
+  alg: "RSA"
+  size: 2048
+
+mybatis:
+  config-location: classpath:config/mybatis-config.xml
+  mapper-locations: classpath:mapper/*.xml
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/JWT?useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: Jsq925522
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: shiqij321@gmail.com
+    password: 980321Jllxcc$
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.starttls.enable: true
+
+
+
+message.mail.verification:
+  Thank you for creating an account. Please click the link below to activate your account. This link will expire in 24 hours.

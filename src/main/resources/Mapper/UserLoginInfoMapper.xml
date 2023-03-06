@@ -1,0 +1,34 @@
+<mapper namespace="com.authentication.Dao.UserLoginInfoMappeDaor" >
+    <resultMap id="ResultMap" type="com.authentication.Model.UserLoginInfo" >
+        <id column="userId" property="userId" jdbcType="VARCHAR" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="signDateTime" property="signDateTime" javaType="BIGINT"/>
+    </resultMap>
+
+
+    <select id="getUserId" resultType="java.lang.Integer">
+        SELECT userId
+        FROM UserLoginInfo
+        where username = #{username}
+    </select>
+
+    <select id="getUser" resultType="java.lang.Integer">
+        SELECT userId, username, password, signDateTime, isVerified
+        FROM UserLoginInfo
+        where userId = #{userId}
+    </select>
+
+    <insert id = "insertUser" resultType = "ResultMap">
+        insert
+        into UserLoginInfo (userId, username, password, signDateTime, isVerified)
+        values (#{userId}, #{username}, #{password}, #{signDateTime}, #{isVerified})
+    </insert>
+
+    <select id="getIsVerified" resultType="java.lang.Integer">
+        SELECT isVerified
+        FROM UserLoginInfo
+        where username = #{username}
+    </select>
+
+</mapper>

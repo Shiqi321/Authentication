@@ -44,8 +44,8 @@ public class SignInAndUpController {
                 userLoginInfo.getPassword());
         try {
             if (fullInfo != null) {
-                String accessToken = jwtService.generateToken(fullInfo.getUserId(), false);
-                String refreshToken = jwtService.generateToken(fullInfo.getUserId(), true);
+                String accessToken = jwtService.generateToken(fullInfo.getUserId(), false, 0);
+                String refreshToken = jwtService.generateToken(fullInfo.getUserId(), true, 0);
                 jwtService.insertRefreshToken(refreshToken);
                 HashMap<String, String> data = new HashMap<>();
                 data.put("access_token", accessToken);
@@ -80,7 +80,7 @@ public class SignInAndUpController {
         userLoginInfo = userInfoOperationService.insertNewUser(userLoginInfo);
 
         try {
-            String token = jwtService.generateToken(userLoginInfo.getUserId(), true);
+            String token = jwtService.generateToken(userLoginInfo.getUserId(), true, 1);
             emailService.sendVerificationEmail(userLoginInfo.getUsername(), token, 0);
             return ResultData.success("please verify your email!");
         } catch (Exception e) {
@@ -99,7 +99,7 @@ public class SignInAndUpController {
             userId = userInfoOperationService.getUserId(username);
         }
         try {
-            if (!jwtService.verifyToken(userId, token).equals(TokenResponse.MatchResponse)) {
+            if (!jwtService.verifyToken(userId, token, 1).equals(TokenResponse.MatchResponse)) {
                 return ResultData.error(Error.VerifiedException);
             }
             switch (type) {
@@ -122,7 +122,7 @@ public class SignInAndUpController {
             return ResultData.error(Error.UserNameException);
         }
         try {
-            String token = jwtService.generateToken(userLoginInfo.getUserId(), true);
+            String token = jwtService.generateToken(userLoginInfo.getUserId(), true, 1);
             emailService.sendVerificationEmail(userLoginInfo.getUsername(), token, 1);
         } catch (Exception e) {
             logger.error(e.getMessage());

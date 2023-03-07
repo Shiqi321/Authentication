@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,8 +60,9 @@ public class JwtService {
     private final String EXP = "exp";
     private final String USER = "user";
     private final String ISSUAT = "issueAt";
+    private final String TOKEN_TYPE = "tokenType";
 
-    public String generateToken(String userId, boolean isRefreshToken) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    public String generateToken(String userId, boolean isRefreshToken, int type) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         //create header
         Map<String, Object> headers = new HashMap<>();
         headers.put(ALGORITHMN, alg);
@@ -76,6 +76,7 @@ public class JwtService {
         claims.put(EXP, expirationTime);
         claims.put(ISSUAT, current);
         claims.put(USER, userId);
+        claims.put(TOKEN_TYPE, type);
         Key secret = secretKeyPairService.loadPrivateKey(pvt);
         JwtBuilder builder = Jwts.builder();
         builder.setHeader(headers);
@@ -84,7 +85,7 @@ public class JwtService {
         return builder.compact();
     }
 
-    public TokenResponse verifyToken(String userId, String token) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public TokenResponse verifyToken(String userId, String token, int type) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         String[] chunks = token.split("\\.");
         if (chunks.length != 3) {
             return TokenResponse.ChangedResponse;
@@ -102,7 +103,7 @@ public class JwtService {
             return TokenResponse.ChangedResponse;
         }
 
-        if (!claims.get(USER).equals(userId)) {
+        if (!claims.get(USER).equals(userId) || !claims.get(TOKEN_TYPE).equals(type)) {
             return TokenResponse.ChangedResponse;
         }
 

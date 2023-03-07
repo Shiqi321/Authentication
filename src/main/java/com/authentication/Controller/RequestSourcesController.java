@@ -32,8 +32,8 @@ public class RequestSourcesController {
                                    @RequestHeader("refresh_token") String refreshToken,
                                    @RequestHeader("user_id")String userId) {
         try {
-            TokenResponse accessTokenResponse = jwtService.verifyToken(userId, accessToken);
-            TokenResponse refreshTokenResponse = jwtService.verifyToken(userId, refreshToken);
+            TokenResponse accessTokenResponse = jwtService.verifyToken(userId, accessToken, 0);
+            TokenResponse refreshTokenResponse = jwtService.verifyToken(userId, refreshToken, 0);
             if (accessTokenResponse.equals(TokenResponse.ExpirationResponse) && refreshTokenResponse.equals(TokenResponse.MatchResponse)) {
                 String refreshId = jwtService.getRefreshId(refreshToken);
                 int isUsed = jwtService.getIsUsed(refreshId);
@@ -51,8 +51,8 @@ public class RequestSourcesController {
                         return ResultData.error(Error.ReautheticationException);
                     }
                 }
-                accessToken = jwtService.generateToken(userId, false);
-                String newRefreshToken = jwtService.generateToken(userId, false);
+                accessToken = jwtService.generateToken(userId, false, 0);
+                String newRefreshToken = jwtService.generateToken(userId, false, 0);
                 jwtService.insertRefreshToken(newRefreshToken);
                 if (!StringUtils.isNullOrEmpty(familyId)) {
                     jwtService.insertFamilyRefreshToken(jwtService.getRefreshId(newRefreshToken), familyId);

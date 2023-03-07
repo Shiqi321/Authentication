@@ -21,11 +21,13 @@ secret:
   pvt: "private.key"
   pub: "public.key"
 spring:
+  profiles:
+    active: docker
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/JWT?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://mysqldb:3306/JWT
     username: root
-    password: Jsq925522
+    password: root
   mail:
     host: smtp.qq.com
     port: 587

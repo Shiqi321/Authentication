@@ -1,7 +1,5 @@
 package com.authentication.Model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
@@ -13,7 +11,8 @@ public enum Error {
     ReautheticationException(-4, "please relogin"),
     TokenException(-5, "the token is not authenticated"),
     VerifiedException(-6, "the email is not verified"),
-    ExistException(-7, "this email has an account");
+    ExistException(-7, "this email has an account"),
+    ServiceException(-8, "services exception");
 
     private int code;
     private String message;

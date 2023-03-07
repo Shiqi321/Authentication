@@ -4,7 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bce9e3a5-1bef-4859-877b-e82b0ed0f786" name="Default Changelist" comment="init" />
+    <list default="true" id="bce9e3a5-1bef-4859-877b-e82b0ed0f786" name="Default Changelist" comment="init">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Interceptor/AuthenticationInterceptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/mybatis-config.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/AuthenticationApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/AuthenticationApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Config/SpringAsyncConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Config/SpringAsyncConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Controller/RequestSourcesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Controller/RequestSourcesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Controller/SignInAndUpController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Controller/SignInAndUpController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Dao/RefreshTokenMapperDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Mapper/RefreshTokenMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Dao/UserLoginInfoMapperDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Mapper/UserLoginInfoMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Handler/EmailAsyncExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Handler/CustomisedAsyncExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Model/Error.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Model/Error.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Model/RefreshToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Model/RefreshToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Model/UserLoginInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Model/UserLoginInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Service/AuthenticateUserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Service/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Service/JwtService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Service/RSAKeyPairService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Service/SecretKeyPairService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/authentication/Service/UserInfoOperationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/authentication/Service/UserInfoOperationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Mapper/UserLoginInfoMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Mapper/UserLoginInfoMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config/mybatis-config.xml" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,6 +36,9 @@
   </component>
   <component name="CodeStyleSettingsInfer">
     <option name="done" value="true" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="COMPILER_PROCESS_ADDITIONAL_VM_OPTIONS" value="-Djps.track.ap.dependencies=false" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -28,7 +55,7 @@
         <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/src" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="SYNC" />
     <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
   </component>
@@ -52,12 +79,42 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.ignored.files" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.1150748" />
+    <property name="settings.editor.selected.configurable" value="project.propCompiler" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources" />
       <recent name="$PROJECT_DIR$/src/main/resources/config" />
     </key>
+  </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn clean" />
+      <command value="mvn compile" />
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="AuthenticationApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.authentication.AuthenticationApplication" />
+      <module name="Authentication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.authentication.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.AuthenticationApplication" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -103,8 +160,42 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/src" />
+    </ignored-roots>
     <MESSAGE value="init" />
     <option name="LAST_COMMIT_MESSAGE" value="init" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/authentication/Controller/SignInAndUpController.java</url>
+          <line>96</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/authentication/Controller/RequestSourcesController.java</url>
+          <line>64</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/authentication/Controller/RequestSourcesController.java</url>
+          <line>34</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/authentication/Controller/RequestSourcesController.java</url>
+          <line>36</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/authentication/Controller/RequestSourcesController.java</url>
+          <line>38</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

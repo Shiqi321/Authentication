@@ -1,12 +1,19 @@
 package com.authentication.Service;
 
-import com.authentication.Dao.RefreshTokenMapperDao;
+import com.authentication.Mapper.RefreshTokenMapper;
 import com.authentication.Model.RefreshToken;
 import com.authentication.Model.RefreshTokenFamily;
 import com.authentication.Model.TokenResponse;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +27,13 @@ import java.util.Map;
 
 @Service
 public class JwtService {
+
+    @Autowired
+    private RefreshTokenMapper refreshTokenMapperDao;
+
+    @Autowired
+    private SecretKeyPairService secretKeyPairService;
+
     @Value("${jwt.alg}")
     private String alg;
     @Value("${jwt.typ}")
@@ -33,8 +47,11 @@ public class JwtService {
     @Value("${jwt.aduience}")
     private String audience;
 
-    @Autowired
-    private RefreshTokenMapperDao refreshTokenMapperDao;
+    @Value("${secret.pvt}")
+    private String pvt;
+
+    @Value("${secret.pub}")
+    private String pub;
 
 
     private final String ALGORITHMN = "alg";
@@ -45,20 +62,21 @@ public class JwtService {
     private final String USER = "user";
     private final String ISSUAT = "issueAt";
 
-    public String generateToken(String userId, boolean isRefreshToken) {
+    public String generateToken(String userId, boolean isRefreshToken) throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         //create header
         Map<String, Object> headers = new HashMap<>();
         headers.put(ALGORITHMN, alg);
         headers.put(TYPE, typ);
         //set claims
         long current = System.currentTimeMillis();
-        Date expirationTime = new Date( current + (isRefreshToken ? refreshExpriation : accessTokenExpiration) * 1000L);
+        long expirationTime = current + (isRefreshToken ? refreshExpriation : accessTokenExpiration) * 1000L;
         Map<String, Object> claims = new HashMap<>();
         claims.put(ISSUER, issuer);
         claims.put(ADU, userId);
         claims.put(EXP, expirationTime);
         claims.put(ISSUAT, current);
-        Key secret = null;
+        claims.put(USER, userId);
+        Key secret = secretKeyPairService.loadPrivateKey(pvt);
         JwtBuilder builder = Jwts.builder();
         builder.setHeader(headers);
         builder.setClaims(claims);
@@ -66,7 +84,7 @@ public class JwtService {
         return builder.compact();
     }
 
-    public TokenResponse verifyToken(String userId, String token) throws IOException {
+    public TokenResponse verifyToken(String userId, String token) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         String[] chunks = token.split("\\.");
         if (chunks.length != 3) {
             return TokenResponse.ChangedResponse;
@@ -76,7 +94,7 @@ public class JwtService {
         String header = new String(decoder.decode(chunks[0]));
         String payload = new String(decoder.decode(chunks[1]));
 
-        Key secret = null;
+        Key secret = secretKeyPairService.loadPublicKey(pub);
         Header headers = Jwts.parser().setSigningKey(secret).parse(token).getHeader();
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 
@@ -88,9 +106,9 @@ public class JwtService {
             return TokenResponse.ChangedResponse;
         }
 
-        Date expirationTime = (Date)claims.get(EXP);
-        Date currentTime = new Date();
-        if (expirationTime.before(currentTime)) {
+        long expirationTime = (Long)claims.get(EXP);
+        long currentTime = System.currentTimeMillis();
+        if (expirationTime < currentTime) {
             return TokenResponse.ExpirationResponse;
         }
         return TokenResponse.MatchResponse;
@@ -100,8 +118,8 @@ public class JwtService {
         return refreshTokenMapperDao.getIsUsed(familyId);
     }
 
-    public String getFamilyId(String refreshToken) {
-        return refreshTokenMapperDao.getFamilyTokenId(refreshToken);
+    public String getFamilyId(String refreshTokenId) {
+        return refreshTokenMapperDao.getFamilyTokenId(refreshTokenId);
     }
 
     public void insertRefreshToken(String refreshToekn) {

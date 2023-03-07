@@ -1,8 +1,13 @@
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:Mapper/*.xml
+server:
+  port: 8080
 jwt:
   alg: "RS256"
   typ: "JWT"
-  access_token_expiration: 30
-  refresh_token_expiration: 300
+  access_token_expiration: 300
+  refresh_token_expiration: 3000
   issuer: "alivia"
   aduience: "resource"
 
@@ -10,11 +15,11 @@ keyPair:
   alg: "RSA"
   size: 2048
 
-mybatis:
-  config-location: classpath:config/mybatis-config.xml
-  mapper-locations: classpath:mapper/*.xml
 
 
+secret:
+  pvt: "private.key"
+  pub: "public.key"
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -22,12 +27,13 @@ spring:
     username: root
     password: Jsq925522
   mail:
-    host: smtp.gmail.com
+    host: smtp.qq.com
     port: 587
-    username: shiqij321@gmail.com
-    password: 980321Jllxcc$
+    username: 834622793@qq.com
+    password: dejrpnvugdrdbdij
     properties.mail.smtp.auth: true
     properties.mail.smtp.starttls.enable: true
+    properties.mail.smtp.starttls.required: true
 
 
 

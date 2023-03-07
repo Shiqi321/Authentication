@@ -1,6 +1,6 @@
 package com.authentication.Config;
 
-import com.authentication.Handler.EmailAsyncExceptionHandler;
+import com.authentication.Handler.CustomisedAsyncExceptionHandler;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -23,7 +23,7 @@ public class SpringAsyncConfig implements AsyncConfigurer {
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return new EmailAsyncExceptionHandler();
+        return new CustomisedAsyncExceptionHandler();
     }
 
 }

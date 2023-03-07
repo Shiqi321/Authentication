@@ -11,4 +11,5 @@ public class RefreshToken {
     private String refreshTokenId;
     private String refreshToken;
     private int isUsed;
+
 }

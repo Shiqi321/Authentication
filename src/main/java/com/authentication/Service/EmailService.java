@@ -27,8 +27,9 @@ public class EmailService {
 
 
     @Async
-    public void sendVerificationEmail(String username, String token) throws MessagingException {
-        sendEmail(verfication + "http://localhost:8080//verifyEmail?"+"username=" + username + "token=" +token,
+    public void sendVerificationEmail(String username, String token, int type) throws MessagingException {
+        sendEmail(verfication + "http://localhost:8080//verifyEmail?"+"username=" + username + "&token=" +token
+                +"&type="+type,
                 username);
     }
 
@@ -40,6 +41,8 @@ public class EmailService {
         helper.setSubject("Verify the email address");
         helper.setText(content, true);
         mailSender.send(mail);
+
+
     }
 
 

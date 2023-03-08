@@ -28,7 +28,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             if (StringUtils.isNullOrEmpty(userId)) {
                 return false;
             }
-            return jwtService.verifyToken(userId, token, 0).equals(TokenResponse.MatchResponse);
+            return jwtService.verifyToken(userId, token, false).equals(TokenResponse.MatchResponse);
 
         } catch (Exception e) {
             logger.error("Error occured while authenticating request : " + e.getMessage());

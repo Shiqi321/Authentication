@@ -46,11 +46,17 @@ public class JwtService {
     @Value("${jwt.aduience}")
     private String audience;
 
-    @Value("${secret.pvt}")
-    private String pvt;
+    @Value("${secret.access_pvt}")
+    private String access_pvt;
 
-    @Value("${secret.pub}")
-    private String pub;
+    @Value("${secret.access_pub}")
+    private String access_pub;
+
+    @Value("${secret.refresh_pvt}")
+    private String refresh_pvt;
+
+    @Value("${secret.refresh_pub}")
+    private String refresh_pub;
 
 
     private final String ALGORITHMN = "alg";
@@ -77,7 +83,7 @@ public class JwtService {
         claims.put(ISSUAT, current);
         claims.put(USER, userId);
         claims.put(TOKEN_TYPE, type);
-        Key secret = secretKeyPairService.loadPrivateKey(pvt);
+        Key secret = secretKeyPairService.loadPrivateKey((isRefreshToken? refresh_pvt : access_pvt));
         JwtBuilder builder = Jwts.builder();
         builder.setHeader(headers);
         builder.setClaims(claims);
@@ -85,7 +91,7 @@ public class JwtService {
         return builder.compact();
     }
 
-    public TokenResponse verifyToken(String userId, String token, int type) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public TokenResponse verifyToken(String userId, String token, boolean isRefreshToken) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         String[] chunks = token.split("\\.");
         if (chunks.length != 3) {
             return TokenResponse.ChangedResponse;
@@ -95,7 +101,7 @@ public class JwtService {
         String header = new String(decoder.decode(chunks[0]));
         String payload = new String(decoder.decode(chunks[1]));
 
-        Key secret = secretKeyPairService.loadPublicKey(pub);
+        Key secret = secretKeyPairService.loadPublicKey((isRefreshToken? refresh_pub : access_pub));
         Header headers = Jwts.parser().setSigningKey(secret).parse(token).getHeader();
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 
@@ -103,8 +109,8 @@ public class JwtService {
             return TokenResponse.ChangedResponse;
         }
 
-        if (!claims.get(USER).equals(userId) || !claims.get(TOKEN_TYPE).equals(type)) {
-            return TokenResponse.ChangedResponse;
+        if (!claims.get(USER).equals(userId) || !claims.get(ISSUER).equals(issuer) || !claims.get(ADU).equals(audience)) {
+            return TokenResponse.InforErrorResponse;
         }
 
         long expirationTime = (Long)claims.get(EXP);

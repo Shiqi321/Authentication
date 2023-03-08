@@ -1,5 +1,8 @@
 package com.authentication.Service;
 
+import com.authentication.Mapper.EmailTokenMapper;
+import com.authentication.Model.EmailToken;
+import com.authentication.Model.TokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.UUID;
 
 
 @Service
@@ -25,9 +29,19 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String from;
 
+    @Value("${message.mail.expiration}")
+    private long expiration;
+
+    @Autowired
+    private EmailTokenMapper emailTokenMapper;
+
+    @Autowired
+    private UserInfoOperationService userInfoOperationService;
+
 
     @Async
-    public void sendVerificationEmail(String username, String token, int type) throws MessagingException {
+    public void sendVerificationEmail(String username, int type) throws MessagingException {
+        String token = generateToken(username, type);
         sendEmail(verfication + "http://localhost:8080//verifyEmail?"+"username=" + username + "&token=" +token
                 +"&type="+type,
                 username);
@@ -41,9 +55,30 @@ public class EmailService {
         helper.setSubject("Verify the email address");
         helper.setText(content, true);
         mailSender.send(mail);
-
-
     }
 
+    public String generateToken(String username, int type) {
+        String userId = userInfoOperationService.getUserId(username);
+        String tokenId = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
+        long ddl = System.currentTimeMillis() + expiration * 1000L;
+        emailTokenMapper.insertEmailToken(new EmailToken(tokenId, userId, token, ddl, type));
+        return token;
+    }
+
+    public TokenResponse verifiedToken(String userId, String token, int type) {
+        EmailToken emailToken = emailTokenMapper.getExpiration(userId, token);
+        if (emailToken == null) {
+            return TokenResponse.NotExistResponse;
+        }
+        if (emailToken.getType() != type) {
+            return TokenResponse.TypeErrorResponse;
+        }
+        long currentTime = System.currentTimeMillis();
+        if (emailToken.getExpiration() < currentTime) {
+            return TokenResponse.ExpirationResponse;
+        }
+        return TokenResponse.MatchResponse;
+    }
 
 }

@@ -18,16 +18,20 @@ keyPair:
 
 
 secret:
-  pvt: "private.key"
-  pub: "public.key"
+  access_pvt: "private.key"
+  access_pub: "public.key"
+  refresh_pvt: ""
+  refresh_pub: ""
 spring:
   profiles:
     active: docker
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://mysqldb:3306/JWT
-    username: root
-    password: root
+    url: jdbc:mysql://${DB_HOST}}/${DB_NAME}}?useSSL=false
+    #url: jdbc:mysql://localhost:3306/JWT
+    username: ${DB_USERNAME}}
+    #password: Jsq925522
+    password: ${DB_PASSWORD}
   mail:
     host: smtp.qq.com
     port: 587
@@ -40,4 +44,5 @@ spring:
 
 
 message.mail.verification:
-  Thank you for creating an account. Please click the link below to activate your account. This link will expire in 24 hours.
+  Thank you for creating an account. Please click the link below to activate your account. This link will expire in 1 hours.
+message.mail.expiration: 3600

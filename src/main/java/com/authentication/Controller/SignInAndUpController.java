@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 
 @RestController
@@ -80,8 +77,8 @@ public class SignInAndUpController {
         userLoginInfo = userInfoOperationService.insertNewUser(userLoginInfo);
 
         try {
-            String token = jwtService.generateToken(userLoginInfo.getUserId(), true, 1);
-            emailService.sendVerificationEmail(userLoginInfo.getUsername(), token, 0);
+
+            emailService.sendVerificationEmail(userLoginInfo.getUsername(), 0);
             return ResultData.success("please verify your email!");
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -95,18 +92,17 @@ public class SignInAndUpController {
                                   @Param("token")String token,
                                   @Param("type")int type) {
         String userId = userInfoOperationService.getUserId(username);
-        if (StringUtils.isNullOrEmpty(userId) && !StringUtils.isNullOrEmpty(username)) {
-            userId = userInfoOperationService.getUserId(username);
+        if (StringUtils.isNullOrEmpty(userId)) {
+            return ResultData.error(Error.UserNameException);
+        }
+        int isVerified = userInfoOperationService.getIsVerified(username);
+        if (isVerified == 1) {
+            return ResultData.success("already verify the email");
         }
         try {
-            if (!jwtService.verifyToken(userId, token, 1).equals(TokenResponse.MatchResponse)) {
-                return ResultData.error(Error.VerifiedException);
-            }
-            switch (type) {
-                case 0: userInfoOperationService.verifiedEmail(1, username);
-                    break;
-                case 1: userInfoOperationService.resetUserLoginInfo(username);
-
+            TokenResponse tokenResponse = emailService.verifiedToken(userId, token, type);
+            if (!tokenResponse.equals(TokenResponse.MatchResponse)) {
+                return ResultData.error(401, tokenResponse.getMessage());
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -122,8 +118,7 @@ public class SignInAndUpController {
             return ResultData.error(Error.UserNameException);
         }
         try {
-            String token = jwtService.generateToken(userLoginInfo.getUserId(), true, 1);
-            emailService.sendVerificationEmail(userLoginInfo.getUsername(), token, 1);
+            emailService.sendVerificationEmail(userLoginInfo.getUsername(), 1);
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResultData.error(Error.ServiceException);

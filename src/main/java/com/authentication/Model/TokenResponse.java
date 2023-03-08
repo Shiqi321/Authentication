@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 public enum TokenResponse {
     ExpirationResponse(0, "token is expired"),
     ChangedResponse(1, "token has been changed"),
-    MatchResponse(2, "token is authenticated");
+    MatchResponse(2, "token is authenticated"),
+    NotExistResponse(3, "token not exist"),
+    TypeErrorResponse(4, "verify type error"),
+    InforErrorResponse(5, "the basic token info is not correct");
 
 
     private int code;

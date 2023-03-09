@@ -15,23 +15,40 @@ keyPair:
   alg: "RSA"
   size: 2048
 
+aws:
+  accessKeyID: AKIAY25PJ3QHYS3TUUFN
+  secretKey: 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
+
 
 
 secret:
-  access_pvt: "private.key"
-  access_pub: "public.key"
-  refresh_pvt: ""
-  refresh_pub: ""
+  access_pvt: access_private_key.pem
+  access_pub: access_public_key.pem
+  refresh_pvt: refresh_private_key.pem
+  refresh_pub: refresh_public_key.pem
+
+puk:
+  access_token.bucket: rsasecrets
+  access_token.key: access_public_key.pem
+  refresh_token.bucket: rsasecrets
+  refresh_token.key: refresh_public_key.pem
+
+pvt:
+  access_token.bucket: rsasecrets
+  access_token.key: access_private_key.pem
+  refresh_token.bucket: rsasecrets
+  refresh_token.key: refresh_private_key.pem
+
 spring:
   profiles:
     active: docker
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST}}/${DB_NAME}}?useSSL=false
+    url: jdbc:mysql://mysql/JWT?useSSL=false
     #url: jdbc:mysql://localhost:3306/JWT
-    username: ${DB_USERNAME}}
+    username: root
     #password: Jsq925522
-    password: ${DB_PASSWORD}
+    password: root
   mail:
     host: smtp.qq.com
     port: 587

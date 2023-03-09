@@ -5,6 +5,7 @@ import com.authentication.Model.RefreshToken;
 import com.authentication.Model.RefreshTokenFamily;
 import com.authentication.Model.TokenResponse;
 
+import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
@@ -83,7 +84,7 @@ public class JwtService {
         claims.put(ISSUAT, current);
         claims.put(USER, userId);
         claims.put(TOKEN_TYPE, type);
-        Key secret = secretKeyPairService.loadPrivateKey((isRefreshToken? refresh_pvt : access_pvt));
+        Key secret = secretKeyPairService.loadPrivateKey((isRefreshToken? refresh_pvt : access_pvt), isRefreshToken);
         JwtBuilder builder = Jwts.builder();
         builder.setHeader(headers);
         builder.setClaims(claims);
@@ -91,7 +92,7 @@ public class JwtService {
         return builder.compact();
     }
 
-    public TokenResponse verifyToken(String userId, String token, boolean isRefreshToken) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public TokenResponse verifyToken(String userId, String token, boolean isRefreshToken) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, URISyntaxException {
         String[] chunks = token.split("\\.");
         if (chunks.length != 3) {
             return TokenResponse.ChangedResponse;
@@ -101,7 +102,7 @@ public class JwtService {
         String header = new String(decoder.decode(chunks[0]));
         String payload = new String(decoder.decode(chunks[1]));
 
-        Key secret = secretKeyPairService.loadPublicKey((isRefreshToken? refresh_pub : access_pub));
+        Key secret = secretKeyPairService.loadPublicKey((isRefreshToken? refresh_pub : access_pub), isRefreshToken);
         Header headers = Jwts.parser().setSigningKey(secret).parse(token).getHeader();
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 

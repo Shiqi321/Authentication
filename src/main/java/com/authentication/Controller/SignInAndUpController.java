@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 @RestController
@@ -68,16 +67,13 @@ public class SignInAndUpController {
     }
 
     @PostMapping("/signUp")
-    public ResultData signUp(UserLoginInfo userLoginInfo) throws NoSuchAlgorithmException {
-        secretKeyPairService.generateKeyPair();
+    public ResultData signUp(UserLoginInfo userLoginInfo) {
         String userId = userInfoOperationService.getUserId(userLoginInfo.getUsername());
         if (!StringUtils.isNullOrEmpty(userId)) {
             return ResultData.error(Error.ExistException);
         }
         userLoginInfo = userInfoOperationService.insertNewUser(userLoginInfo);
-
         try {
-
             emailService.sendVerificationEmail(userLoginInfo.getUsername(), 0);
             return ResultData.success("please verify your email!");
         } catch (Exception e) {
@@ -126,9 +122,5 @@ public class SignInAndUpController {
 
         return ResultData.success("reset password email sent successfully!");
     }
-    //for test
-    @GetMapping("/generate_secret")
-    public void generate() throws NoSuchAlgorithmException {
-        secretKeyPairService.generateKeyPair();
-    }
+
 }

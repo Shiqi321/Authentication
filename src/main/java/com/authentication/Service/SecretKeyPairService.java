@@ -112,6 +112,9 @@ public class SecretKeyPairService {
         KeyFactory keyFactory = KeyFactory.getInstance(alg);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
         RSAPrivateKey pvt = (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+        if (!ptvFile.delete()) {
+            logger.error("fail to delete private key: " + file);
+        }
         return pvt;
     }
 

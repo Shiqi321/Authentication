@@ -48,13 +48,19 @@ public class refreshTokenController {
                 accessToken = jwtService.generateToken(userId, false, 0);
                 String newRefreshToken = jwtService.generateToken(userId, false, 0);
                 jwtService.insertRefreshToken(newRefreshToken);
+                String newRefreshTokenId = jwtService.getRefreshId(newRefreshToken);
                 if (!StringUtils.isNullOrEmpty(familyId)) {
-                    jwtService.insertFamilyRefreshToken(jwtService.getRefreshId(newRefreshToken), familyId);
+                    jwtService.insertFamilyRefreshToken(newRefreshTokenId, familyId);
+                } else {
+                    jwtService.insertFamilyRefreshToken(newRefreshTokenId, refreshId);
                 }
+                jwtService.setIsUsed(0, refreshId);
                 HashMap<String, String> data = new HashMap<>();
                 data.put("access_token", accessToken);
                 data.put("refresh_token", newRefreshToken);
                 return ResultData.success(data);
+            } else if (accessTokenResponse.equals(TokenResponse.MatchResponse) && refreshTokenResponse.equals(TokenResponse.MatchResponse)) {
+                return ResultData.success("the token has not expired");
             } else {
                 String refreshId = jwtService.getRefreshId(refreshToken);
                 jwtService.setIsUsed(0, refreshId);

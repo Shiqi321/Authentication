@@ -44,7 +44,7 @@ public class JwtService {
     private long accessTokenExpiration;
     @Value("${jwt.refresh_token_expiration}")
     private long refreshExpriation;
-    @Value("${jwt.aduience}")
+    @Value("${jwt.audience}")
     private String audience;
 
     @Value("${secret.access_pvt}")
@@ -79,7 +79,7 @@ public class JwtService {
         long expirationTime = current + (isRefreshToken ? refreshExpriation : accessTokenExpiration) * 1000L;
         Map<String, Object> claims = new HashMap<>();
         claims.put(ISSUER, issuer);
-        claims.put(ADU, userId);
+        claims.put(ADU, audience);
         claims.put(EXP, expirationTime);
         claims.put(ISSUAT, current);
         claims.put(USER, userId);
@@ -137,8 +137,7 @@ public class JwtService {
         refreshTokenMapperDao.insertRefreshToken(refreshToken);
     }
 
-    public void insertFamilyRefreshToken(String refreshToken, String familyId) {
-        String refreshTokenId = getRefreshId(refreshToken);
+    public void insertFamilyRefreshToken(String refreshTokenId, String familyId) {
         RefreshTokenFamily refreshTokenFamily = new RefreshTokenFamily(refreshTokenId, familyId);
         refreshTokenMapperDao.insertFamilyRefreshToken(refreshTokenFamily);
     }

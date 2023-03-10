@@ -9,7 +9,7 @@ jwt:
   access_token_expiration: 300
   refresh_token_expiration: 3000
   issuer: "alivia"
-  aduience: "resource"
+  audience: "resource"
 
 keyPair:
   alg: "RSA"

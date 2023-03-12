@@ -2,23 +2,20 @@ package com.authentication.Service;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemObjectGenerator;
 import org.bouncycastle.util.io.pem.PemWriter;
-import software.amazon.awssdk.transfer.s3.S3TransferManager;
-import software.amazon.awssdk.transfer.s3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.nio.file.NoSuchFileException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -71,13 +68,10 @@ public class SecretKeyPairService {
         logger.info(String.format("%s successfully writen in file %s.", description, filename));
     }
 
-    public Key loadPublicKey(String file, boolean isRefresh) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public Key loadPublicKey(String file) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         File pubFile = new File(file);
         if (!pubFile.exists() || pubFile.length() == 0) {
-            String bucketName = isRefresh ? pubRefreshBucketName : pubAccessBucketName;
-            String keyName = isRefresh? pubRefreshKeyName : pubAccessKeyName;
-            downloadFromAws(bucketName, keyName);
-            pubFile = new File(file);
+            throw new NoSuchFileException(file);
         }
         String key = new String(Files.readAllBytes(pubFile.toPath()), Charset.defaultCharset());
 
@@ -94,13 +88,10 @@ public class SecretKeyPairService {
         return pub;
     }
 
-    public Key loadPrivateKey(String file, boolean isRefresh) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public Key loadPrivateKey(String file) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         File ptvFile = new File(file);
         if (!ptvFile.exists() || ptvFile.length() == 0) {
-            String bucketName = isRefresh ? pvtRefreshBucketName : pvtAccessBucketName;
-            String keyName = isRefresh? pvtRefreshKeyName : pvtAccessKeyName;
-            downloadFromAws(bucketName, keyName);
-            ptvFile = new File(file);
+            throw new NoSuchFileException(file);
         }
         String key = new String(Files.readAllBytes(ptvFile.toPath()), Charset.defaultCharset());
         String privateKeyPEM = key
@@ -112,31 +103,7 @@ public class SecretKeyPairService {
         KeyFactory keyFactory = KeyFactory.getInstance(alg);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
         RSAPrivateKey pvt = (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
-        if (!ptvFile.delete()) {
-            logger.error("fail to delete private key: " + file);
-        }
         return pvt;
-    }
-
-    public void downloadFromAws(String bucketName, String keyName) {
-        S3TransferManager transferManager = S3TransferManager.create();
-        downloadFile(transferManager, bucketName, keyName, keyName);
-    }
-
-    public Long downloadFile(S3TransferManager transferManager, String bucketName,
-                             String key, String downloadedFileWithPath) {
-        DownloadFileRequest downloadFileRequest =
-                DownloadFileRequest.builder()
-                        .getObjectRequest(b -> b.bucket(bucketName).key(key))
-                        .addTransferListener(LoggingTransferListener.create())
-                        .destination(Paths.get(downloadedFileWithPath))
-                        .build();
-
-        FileDownload downloadFile = transferManager.downloadFile(downloadFileRequest);
-
-        CompletedFileDownload downloadResult = downloadFile.completionFuture().join();
-        logger.info("Content length [{}]", downloadResult.response().contentLength());
-        return downloadResult.response().contentLength();
     }
 
 }

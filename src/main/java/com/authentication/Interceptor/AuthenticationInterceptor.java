@@ -23,12 +23,15 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         try {
-            String token = request.getHeader("token").replace("Bearer ","");
+            String token = request.getHeader("token");
             String userId = request.getHeader("user_id");
-            if (StringUtils.isNullOrEmpty(userId)) {
+            if (StringUtils.isNullOrEmpty(userId) || StringUtils.isNullOrEmpty(token) || !token.contains("Bearer")) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return false;
             }
-            return jwtService.verifyToken(userId, token, false).equals(TokenResponse.MatchResponse);
+            if(jwtService.verifyToken(userId, token, false).equals(TokenResponse.MatchResponse)) {
+                return true;
+            }
 
         } catch (Exception e) {
             logger.error("Error occured while authenticating request : " + e.getMessage());

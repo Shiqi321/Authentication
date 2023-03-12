@@ -1,8 +1,9 @@
 package com.authentication.Service;
 
-import com.authentication.Mapper.EmailTokenMapper;
 import com.authentication.Model.EmailToken;
 import com.authentication.Model.TokenResponse;
+import com.authentication.Model.UserLoginInfo;
+import com.authentication.Repository.EmailTokenRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,16 @@ public class EmailService {
     private long expiration;
 
     @Autowired
-    private EmailTokenMapper emailTokenMapper;
+    private EmailTokenRepository emailTokenRepository;
 
     @Autowired
     private UserInfoOperationService userInfoOperationService;
 
 
     @Async
-    public void sendVerificationEmail(String username, int type) throws MessagingException {
-        String token = generateToken(username, type);
-        sendEmail(verfication + "http://localhost:8080//verifyEmail?"+"username=" + username + "&token=" +token
+    public void sendVerificationEmail(String userId, String username, int type) throws MessagingException {
+        String token = generateToken(userId, type);
+        sendEmail(verfication + "http://localhost:8080//verifyEmail?"+"userId=" + userId + "&token=" +token
                 +"&type="+type,
                 username);
     }
@@ -57,19 +58,22 @@ public class EmailService {
         mailSender.send(mail);
     }
 
-    public String generateToken(String username, int type) {
-        String userId = userInfoOperationService.getUserId(username);
+    public String generateToken(String userId, int type) {
         String tokenId = UUID.randomUUID().toString();
         String token = UUID.randomUUID().toString();
         long ddl = System.currentTimeMillis() + expiration * 1000L;
-        emailTokenMapper.insertEmailToken(new EmailToken(tokenId, userId, token, ddl, type));
+        emailTokenRepository.save(new EmailToken(tokenId, userId, token, ddl, type));
         return token;
     }
 
     public TokenResponse verifiedToken(String userId, String token, int type) {
-        EmailToken emailToken = emailTokenMapper.getExpiration(userId, token);
+
+        EmailToken emailToken = emailTokenRepository.findByUserId(userId);
         if (emailToken == null) {
             return TokenResponse.NotExistResponse;
+        }
+        if (!emailToken.getToken().equals(token)) {
+            return TokenResponse.ChangedResponse;
         }
         if (emailToken.getType() != type) {
             return TokenResponse.TypeErrorResponse;
@@ -78,6 +82,7 @@ public class EmailService {
         if (emailToken.getExpiration() < currentTime) {
             return TokenResponse.ExpirationResponse;
         }
+        emailTokenRepository.delete(emailToken);
         return TokenResponse.MatchResponse;
     }
 

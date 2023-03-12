@@ -1,6 +1,5 @@
 package com.authentication.Model;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor

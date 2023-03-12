@@ -3,7 +3,7 @@ package com.authentication.Service;
 
 import com.authentication.Model.UserLoginInfo;
 import com.authentication.Repository.UserLoginInfoRepository;
-import com.authentication.Util.HashUtils;
+import com.authentication.Util.Utils;
 import com.authentication.Util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class UserInfoOperationService {
         userLoginInfo.setIsDeleted(0);
         userLoginInfo.setLastUpdateTime(currentTime);
         String salt = String.valueOf(currentTime % 10000);
-        String hashedPassword = HashUtils.saltHash(salt, userLoginInfo.getPassword());
+        String hashedPassword = Utils.saltHash(salt, userLoginInfo.getPassword());
         userLoginInfo.setPassword(hashedPassword);
         userLoginInfoRepository.save(userLoginInfo);
         return userLoginInfo;
@@ -52,7 +52,7 @@ public class UserInfoOperationService {
         if (userLoginInfo != null) {
             long signDateTime = userLoginInfo.getSignDateTime();
             String salt = String.valueOf(signDateTime % 10000);
-            String hashedPassword = HashUtils.saltHash(salt,password);
+            String hashedPassword = Utils.saltHash(salt,password);
             if (hashedPassword.equals(userLoginInfo.getPassword())) {
                 return true;
             }
@@ -69,6 +69,7 @@ public class UserInfoOperationService {
     }
 
     public void updateUser(UserLoginInfo userLoginInfo) {
+        userLoginInfo.setLastUpdateTime(System.currentTimeMillis());
         userLoginInfoRepository.save(userLoginInfo);
 
     }

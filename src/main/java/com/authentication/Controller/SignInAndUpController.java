@@ -9,6 +9,7 @@ import com.authentication.Service.EmailService;
 import com.authentication.Service.JwtService;
 import com.authentication.Service.SecretKeyPairService;
 import com.authentication.Service.UserInfoOperationService;
+import com.authentication.Util.Utils;
 import com.mysql.cj.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +76,10 @@ public class SignInAndUpController {
 
     @PostMapping("/signUp")
     public ResultData signUp(UserLoginInfo userLoginInfo) {
-        if (userLoginInfo == null || StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) ||
-                StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
+        if (userLoginInfo == null || StringUtils.isNullOrEmpty(userLoginInfo.getUsername()
+        )|| !Utils.checkEmailFormat(userLoginInfo.getUsername()) ||
+                StringUtils.isNullOrEmpty(userLoginInfo.getPassword()) ||
+                !Utils.checkPasswordRule(userLoginInfo.getPassword())) {
             return ResultData.error(400);
         }
         UserLoginInfo user = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
@@ -129,7 +132,7 @@ public class SignInAndUpController {
     public ResultData restPassword(UserLoginInfo userLoginInfo,
                                    @RequestParam("original_password") String oldPassword) {
         if (userLoginInfo == null || StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) ||
-                StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
+                StringUtils.isNullOrEmpty(userLoginInfo.getPassword()) || !Utils.checkPasswordRule(userLoginInfo.getPassword())) {
             return ResultData.error(400);
         }
         userLoginInfo = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
@@ -139,7 +142,6 @@ public class SignInAndUpController {
         if (!userInfoOperationService.getMatched(userLoginInfo.getUsername(), oldPassword)) {
             return ResultData.error(400);
         }
-        userLoginInfo.setLastUpdateTime(System.currentTimeMillis());
         userInfoOperationService.updateUser(userLoginInfo);
         try {
             emailService.sendVerificationEmail(userLoginInfo.getUserId(), userLoginInfo.getUsername(), 1);
@@ -165,6 +167,35 @@ public class SignInAndUpController {
         jwtService.invalidateToken(userId, accessToken, false);
         jwtService.invalidateToken(userId, refreshToken, true);
         return ResultData.success();
+    }
+
+    @GetMapping("/closeAccount")
+    public ResultData closeAccount(UserLoginInfo userLoginInfo,
+                                   @RequestHeader("access_token") String accessToken) throws NoSuchAlgorithmException, URISyntaxException, InvalidKeySpecException, IOException {
+        if (StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) ||
+                StringUtils.isNullOrEmpty(accessToken) || StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
+            return ResultData.error(400);
+        }
+        UserLoginInfo user = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
+        if (user == null || user.getIsDeleted() == 1 || user.getIsVerified() == 0) {
+            return ResultData.error(400);
+        }
+        if (!userInfoOperationService.getMatched(userLoginInfo.getUsername(), userLoginInfo.getPassword())) {
+            return ResultData.error(400);
+        }
+        try {
+            if (jwtService.verifyToken(user.getUserId(), accessToken, false).equals(TokenResponse.MatchResponse)) {
+                user.setIsDeleted(1);
+                userInfoOperationService.updateUser(userLoginInfo);
+                return ResultData.success();
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResultData.error(Error.ServiceException);
+        }
+        return ResultData.error(400);
+
+
     }
 
 }

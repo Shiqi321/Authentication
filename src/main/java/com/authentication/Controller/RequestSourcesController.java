@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.mysql.cj.util.StringUtils;
 
 @RestController
 public class RequestSourcesController {
@@ -20,7 +20,9 @@ public class RequestSourcesController {
 
     @GetMapping("/requestSources")
     public ResultData requestSources(@RequestHeader("user_id")String userId) {
-
+        if (StringUtils.isNullOrEmpty(userId)) {
+            return ResultData.error(400);
+        }
         return ResultData.success("success");
     }
 

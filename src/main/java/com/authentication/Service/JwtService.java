@@ -25,8 +25,6 @@ import java.util.Map;
 
 @Service
 public class JwtService {
-
-
     @Autowired
     private SecretKeyPairService secretKeyPairService;
 
@@ -57,8 +55,6 @@ public class JwtService {
 
     @Value("${secret.refresh_pub}")
     private String refresh_pub;
-
-
 
     private final String ALGORITHMN = "alg";
     private final String TYPE = "typ";
@@ -138,38 +134,6 @@ public class JwtService {
         }
         return TokenResponse.MatchResponse;
     }
-
-//    public int getIsUsed(String familyId) {
-//        return refreshTokenMapperDao.getIsUsed(familyId);
-//    }
-//
-//    public String getFamilyId(String refreshTokenId) {
-//        return refreshTokenMapperDao.getFamilyTokenId(refreshTokenId);
-//    }
-//
-//    public void insertRefreshToken(String refreshToekn) {
-//        UUID uuid = UUID.randomUUID();
-//        String refreshId = uuid.toString();
-//        RefreshToken refreshToken = new RefreshToken(refreshId, refreshToekn, 1);
-//        refreshTokenMapperDao.insertRefreshToken(refreshToken);
-//    }
-//
-//    public void insertFamilyRefreshToken(String refreshTokenId, String familyId) {
-//        RefreshTokenFamily refreshTokenFamily = new RefreshTokenFamily(refreshTokenId, familyId);
-//        refreshTokenMapperDao.insertFamilyRefreshToken(refreshTokenFamily);
-//    }
-//
-//    public void setIsUsed(int isUsed, String refreshId) {
-//        refreshTokenMapperDao.setIsUsed(isUsed, refreshId);
-//    }
-//
-//    public void setIsUsedByFamilyId(int isUsed, String familyId) {
-//        refreshTokenMapperDao.setIsUsedByFamilyId(isUsed, familyId);
-//    }
-//
-//    public String getRefreshId(String refreshToken) {
-//        return refreshTokenMapperDao.getRefreshId(refreshToken);
-//    }
 
     public long getTokenExpiration(String token) throws IOException {
         String[] chunks = token.split("\\.");

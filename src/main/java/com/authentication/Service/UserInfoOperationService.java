@@ -24,7 +24,6 @@ public class UserInfoOperationService {
 
 
     public UserLoginInfo getUserById(String userId) {
-        //UserLoginInfo userLoginInfo = userLoginInfoMapperDao.getUser(userId);
         Optional<UserLoginInfo> userLoginInfo = userLoginInfoRepository.findById(userId);
         return userLoginInfo.get();
     }
@@ -33,13 +32,14 @@ public class UserInfoOperationService {
         return userLoginInfoRepository.findByUsername(username);
     }
 
-
     public UserLoginInfo insertNewUser(UserLoginInfo userLoginInfo) {
         String userId = UUID.randomUUID().toString();
         userLoginInfo.setUserId(userId);
         userLoginInfo.setIsVerified(0);
         long currentTime = System.currentTimeMillis();
         userLoginInfo.setSignDateTime(currentTime);
+        userLoginInfo.setIsDeleted(0);
+        userLoginInfo.setLastUpdateTime(currentTime);
         String salt = String.valueOf(currentTime % 10000);
         String hashedPassword = HashUtils.saltHash(salt, userLoginInfo.getPassword());
         userLoginInfo.setPassword(hashedPassword);
@@ -47,34 +47,17 @@ public class UserInfoOperationService {
         return userLoginInfo;
     }
 
-    public UserLoginInfo getMatched(String username, String password) {
+    public boolean getMatched(String username, String password) {
         UserLoginInfo userLoginInfo = userLoginInfoRepository.findByUsername(username);
         if (userLoginInfo != null) {
             long signDateTime = userLoginInfo.getSignDateTime();
             String salt = String.valueOf(signDateTime % 10000);
             String hashedPassword = HashUtils.saltHash(salt,password);
             if (hashedPassword.equals(userLoginInfo.getPassword())) {
-                return userLoginInfo;
+                return true;
             }
         }
-        return null;
-    }
-
-//    public void resetUserLoginInfo(String username) {
-//        String userId = getUserId(username);
-//        UserLoginInfo userLoginInfo = userLoginInfoRepository.findById(userId);
-//        userLoginInfo.setIsVerified(1);
-//        long currentTime = System.currentTimeMillis();
-//        userLoginInfo.setSignDateTime(currentTime);
-//        String salt = String.valueOf(currentTime % 10000);
-//        String hashedPassword = HashUtils.saltHash(salt, userLoginInfo.getPassword());
-//        userLoginInfo.setPassword(hashedPassword);
-//        userLoginInfoMapperDao.updateUserLoginInfo(userLoginInfo);
-//    }
-
-    public void blockUser(String userId, long time) {
-        String key = "blocked";
-        redisUtil.sSetAndTime(key, time, userId);
+        return false;
     }
 
     public long getLoginTimes(String userId) {

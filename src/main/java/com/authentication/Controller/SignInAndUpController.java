@@ -45,29 +45,26 @@ public class SignInAndUpController {
         if (StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) || StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
             return ResultData.error(400);
         }
-        UserLoginInfo fullInfo = userInfoOperationService.getMatched(userLoginInfo.getUsername(),
-                userLoginInfo.getPassword());
+
+        UserLoginInfo user = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
+        if (user == null || user.getIsDeleted() == 1 || user.getIsVerified() == 0) {
+            return ResultData.error(400);
+        }
         try {
-            if (fullInfo != null) {
-                if (fullInfo.getIsVerified() == 0) {
-                    return ResultData.error(Error.VerifiedException);
-                }
-                if (userInfoOperationService.getLoginTimes(fullInfo.getUserId()) > 10) {
+            if (userInfoOperationService.getMatched(userLoginInfo.getUsername(), userLoginInfo.getPassword())) {
+
+                if (userInfoOperationService.getLoginTimes(user.getUserId()) > 10) {
                     ResultData.error(403);
                 }
-                String accessToken = jwtService.generateToken(fullInfo.getUserId(), false, 0);
-                String refreshToken = jwtService.generateToken(fullInfo.getUserId(), true, 0);
+                String accessToken = jwtService.generateToken(user.getUserId(), false, 0);
+                String refreshToken = jwtService.generateToken(user.getUserId(), true, 0);
                 HashMap<String, String> data = new HashMap<>();
                 data.put("access_token", accessToken);
                 data.put("refresh_token", refreshToken);
                 return ResultData.success(data);
+
             } else {
-                UserLoginInfo user = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
-                if (user != null && StringUtils.isNullOrEmpty(user.getUserId())) {
-                    return ResultData.error(Error.MatchedException);
-                } else {
-                    return ResultData.error(Error.UserNameException);
-                }
+                return ResultData.error(Error.MatchedException);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -78,16 +75,15 @@ public class SignInAndUpController {
 
     @PostMapping("/signUp")
     public ResultData signUp(UserLoginInfo userLoginInfo) {
-        if (StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) || StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
+        if (userLoginInfo == null || StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) ||
+                StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
             return ResultData.error(400);
         }
-        //String userId = userInfoOperationService.getUserId(userLoginInfo.getUsername());
         UserLoginInfo user = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
         if (user != null) {
             return ResultData.error(Error.ExistException);
         }
         userLoginInfo = userInfoOperationService.insertNewUser(userLoginInfo);
-
         try {
             emailService.sendVerificationEmail(userLoginInfo.getUserId(), userLoginInfo.getUsername(), 0);
             return ResultData.success("please verify your email!");
@@ -110,7 +106,7 @@ public class SignInAndUpController {
         if (userLoginInfo == null) {
             return ResultData.error(Error.UserNameException);
         }
-        //int isVerified = userInfoOperationService.getIsVerified(username);
+
         if (userLoginInfo.getIsVerified() == 1) {
             return ResultData.success("already verify the email");
         }
@@ -130,13 +126,23 @@ public class SignInAndUpController {
     }
 
     @GetMapping("/restPassword")
-    public ResultData restPassword(UserLoginInfo userLoginInfo) {
-        userLoginInfo = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
-        if (userLoginInfo == null) {
-            return ResultData.error(Error.UserNameException);
+    public ResultData restPassword(UserLoginInfo userLoginInfo,
+                                   @RequestParam("original_password") String oldPassword) {
+        if (userLoginInfo == null || StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) ||
+                StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
+            return ResultData.error(400);
         }
+        userLoginInfo = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
+        if (userLoginInfo == null || userLoginInfo.getIsDeleted() == 1 || userLoginInfo.getIsVerified() == 0) {
+            return ResultData.error(400);
+        }
+        if (!userInfoOperationService.getMatched(userLoginInfo.getUsername(), oldPassword)) {
+            return ResultData.error(400);
+        }
+        userLoginInfo.setLastUpdateTime(System.currentTimeMillis());
+        userInfoOperationService.updateUser(userLoginInfo);
         try {
-            //emailService.sendVerificationEmail(userLoginInfo.getUserId(), userLoginInfo.getUsername(), 1);
+            emailService.sendVerificationEmail(userLoginInfo.getUserId(), userLoginInfo.getUsername(), 1);
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResultData.error(Error.ServiceException);
@@ -150,11 +156,11 @@ public class SignInAndUpController {
                              @RequestHeader("access_token") String accessToken,
                              @RequestHeader("refresh_token") String refreshToken) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, URISyntaxException {
         if (StringUtils.isNullOrEmpty(userId) || StringUtils.isNullOrEmpty(accessToken) || StringUtils.isNullOrEmpty(refreshToken)) {
-            return ResultData.error(412);
+            return ResultData.error(400);
         }
         UserLoginInfo userLoginInfo = userInfoOperationService.getUserById(userId);
-        if (userLoginInfo == null) {
-            return ResultData.error(412);
+        if (userLoginInfo == null || userLoginInfo.getIsDeleted() == 1 || userLoginInfo.getIsVerified() == 0) {
+            return ResultData.error(400);
         }
         jwtService.invalidateToken(userId, accessToken, false);
         jwtService.invalidateToken(userId, refreshToken, true);

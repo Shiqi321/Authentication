@@ -43,50 +43,6 @@ public class refreshTokenController {
             }
             return ResultData.error(Error.ReautheticationException);
 
-//            if (accessTokenResponse.equals(TokenResponse.ExpirationResponse) && refreshTokenResponse.equals(TokenResponse.MatchResponse)) {
-//                String refreshId = jwtService.getRefreshId(refreshToken);
-//                int isUsed = jwtService.getIsUsed(refreshId);
-//                String familyId = jwtService.getFamilyId(refreshId);
-//                if (isUsed == 0) {
-//                    if (!StringUtils.isNullOrEmpty(familyId)) {
-//                        jwtService.setIsUsedByFamilyId(0, familyId);
-//                    }
-//                    return ResultData.error(Error.ReautheticationException);
-//                }
-//                if (!StringUtils.isNullOrEmpty(familyId)) {
-//                    int familyIdIsUsed = jwtService.getIsUsed(familyId);
-//                    if (familyIdIsUsed == 0) {
-//                        jwtService.setIsUsed(0, refreshId);
-//                        return ResultData.error(Error.ReautheticationException);
-//                    }
-//                }
-//                accessToken = jwtService.generateToken(userId, false, 0);
-//                String newRefreshToken = jwtService.generateToken(userId, false, 0);
-//                jwtService.insertRefreshToken(newRefreshToken);
-//                String newRefreshTokenId = jwtService.getRefreshId(newRefreshToken);
-//                if (!StringUtils.isNullOrEmpty(familyId)) {
-//                    jwtService.insertFamilyRefreshToken(newRefreshTokenId, familyId);
-//                } else {
-//                    jwtService.insertFamilyRefreshToken(newRefreshTokenId, refreshId);
-//                }
-//                jwtService.setIsUsed(0, refreshId);
-//                HashMap<String, String> data = new HashMap<>();
-//                data.put("access_token", accessToken);
-//                data.put("refresh_token", newRefreshToken);
-//                return ResultData.success(data);
-//            } else if (accessTokenResponse.equals(TokenResponse.MatchResponse) && refreshTokenResponse.equals(TokenResponse.MatchResponse)) {
-//                return ResultData.success("the token has not expired");
-//            } else {
-//                String refreshId = jwtService.getRefreshId(refreshToken);
-//                jwtService.setIsUsed(0, refreshId);
-//                String familyId = jwtService.getFamilyId(refreshId);
-//                if (!StringUtils.isNullOrEmpty(familyId)) {
-//                    jwtService.setIsUsedByFamilyId(0, familyId);
-//                }
-//                return ResultData.error(Error.ReautheticationException);
-//            }
-
-
 
         } catch (Exception e) {
             logger.error(e.getMessage());

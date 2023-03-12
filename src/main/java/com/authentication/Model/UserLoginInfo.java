@@ -30,4 +30,8 @@ public class UserLoginInfo {
     private long signDateTime;
     @Column(name = "isVerified")
     private int isVerified;
+    @Column
+    private long lastUpdateTime;
+    @Column
+    private int isDeleted;
 }

@@ -54,20 +54,6 @@ public class SecretKeyPairService {
     @Value("${pvt.refresh_token.key}")
     private String pvtRefreshKeyName;
 
-
-    public void writePemFile(Key key, String description, String filename)
-            throws IOException {
-        PemObject pemObject = new PemObject(description, key.getEncoded());
-        PemWriter pemWriter = new PemWriter(new OutputStreamWriter(new FileOutputStream(filename)));
-        try {
-            pemWriter.writeObject(pemObject);
-        } finally {
-            pemWriter.close();
-        }
-
-        logger.info(String.format("%s successfully writen in file %s.", description, filename));
-    }
-
     public Key loadPublicKey(String file) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         File pubFile = new File(file);
         if (!pubFile.exists() || pubFile.length() == 0) {

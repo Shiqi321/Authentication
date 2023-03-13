@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,14 +43,14 @@ public class SignInAndUpController {
     private SecretKeyPairService secretKeyPairService;
 
     @PostMapping("/login")
-    public ResultData login(UserLoginInfo userLoginInfo) {
+    public ResultData login(@RequestBody UserLoginInfo userLoginInfo) {
         if (StringUtils.isNullOrEmpty(userLoginInfo.getUsername()) || StringUtils.isNullOrEmpty(userLoginInfo.getPassword())) {
             return ResultData.error(400);
         }
 
         UserLoginInfo user = userInfoOperationService.getUserByUsername(userLoginInfo.getUsername());
         if (user == null || user.getIsDeleted() == 1 || user.getIsVerified() == 0) {
-            return ResultData.error(400);
+            return ResultData.error(402);
         }
         try {
             if (userInfoOperationService.getMatched(userLoginInfo.getUsername(), userLoginInfo.getPassword())) {
@@ -75,7 +76,7 @@ public class SignInAndUpController {
     }
 
     @PostMapping("/signUp")
-    public ResultData signUp(UserLoginInfo userLoginInfo) {
+    public ResultData signUp(@RequestBody UserLoginInfo userLoginInfo) {
         if (userLoginInfo == null || StringUtils.isNullOrEmpty(userLoginInfo.getUsername()
         )|| !Utils.checkEmailFormat(userLoginInfo.getUsername()) ||
                 StringUtils.isNullOrEmpty(userLoginInfo.getPassword()) ||
